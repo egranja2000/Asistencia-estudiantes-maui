@@ -1,0 +1,16 @@
+<Project>
+  <!-- Propiedades comunes a todos los proyectos de la solución -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Necesario para que IDE0005 (usings no usados) se reporte al compilar -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Company>Asistencia de Estudiantes</Company>
+    <Product>Asistencia</Product>
+    <NeutralLanguage>es-EC</NeutralLanguage>
+  </PropertyGroup>
+
+</Project>

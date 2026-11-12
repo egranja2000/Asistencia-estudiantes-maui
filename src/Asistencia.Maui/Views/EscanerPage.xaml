@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="Asistencia.Maui.Views.EscanerPage"
+             Title="Escanear QR"
+             Shell.BackgroundColor="#0F172A"
+             Shell.ForegroundColor="White"
+             Shell.TitleColor="White"
+             BackgroundColor="#0F172A">
+
+    <Grid>
+        <zxing:CameraBarcodeReaderView x:Name="Lector"
+                                       IsDetecting="False"
+                                       BarcodesDetected="OnBarcodesDetected" />
+
+        <!-- Marco guía con esquinas resaltadas -->
+        <Grid WidthRequest="260" HeightRequest="260" HorizontalOptions="Center" VerticalOptions="Center"
+              InputTransparent="True">
+            <Border Stroke="#66FFFFFF" StrokeThickness="1.5" StrokeShape="RoundRectangle 28" />
+            <Border Stroke="#818CF8" StrokeThickness="5" StrokeShape="RoundRectangle 28"
+                    StrokeDashArray="9,30" StrokeDashOffset="4.5" />
+        </Grid>
+
+        <!-- Panel inferior -->
+        <Border VerticalOptions="End" Margin="16,0,16,28" Padding="18,16"
+                BackgroundColor="#E60F172A" Stroke="#33FFFFFF" StrokeThickness="1"
+                StrokeShape="RoundRectangle 24">
+            <VerticalStackLayout Spacing="12">
+                <ActivityIndicator x:Name="Indicador" Color="#A5B4FC" IsRunning="False" IsVisible="False" />
+                <Label x:Name="Estado" Text="Apunta al código QR que muestra el docente"
+                       TextColor="White" FontSize="16" HorizontalTextAlignment="Center" />
+                <Button x:Name="BotonLinterna" Text="🔦  Linterna" Clicked="OnLinterna"
+                        Style="{StaticResource BotonClaro}" HorizontalOptions="Center" WidthRequest="170" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

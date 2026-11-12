@@ -1,0 +1,103 @@
+@{
+    var autenticado = User.Identity?.IsAuthenticated == true;
+    var nombre = User.Identity?.Name ?? "";
+    var iniciales = string.Concat(nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => char.ToUpperInvariant(p[0])));
+    var controlador = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@(ViewData["Title"] ?? "Asistencia") · Portal Docente</title>
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+</head>
+<body class="min-h-full">
+
+@if (autenticado)
+{
+    <header class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur">
+        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-8">
+                <a asp-controller="Cursos" asp-action="Index" class="flex items-center gap-2.5">
+                    <span class="grid size-9 place-items-center rounded-xl bg-linear-to-br from-marca-500 to-marca-700 text-white shadow-sm">
+                        @Iconos.Svg("birrete", "size-5")
+                    </span>
+                    <span class="leading-tight">
+                        <span class="block text-sm font-bold text-slate-900">Asistencia</span>
+                        <span class="block text-xs text-slate-500">Portal docente</span>
+                    </span>
+                </a>
+                <nav class="hidden items-center gap-1 sm:flex">
+                    <a asp-controller="Cursos" asp-action="Index"
+                       class="rounded-lg px-3 py-2 text-sm font-medium @(controlador is "Cursos" or "Sesiones" ? "bg-marca-50 text-marca-700" : "text-slate-600 hover:bg-slate-100")">
+                        Mis cursos
+                    </a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="hidden text-right sm:block">
+                    <div class="text-sm font-medium text-slate-800">@nombre</div>
+                    <div class="text-xs text-slate-500">Docente</div>
+                </div>
+                <span class="grid size-9 place-items-center rounded-full bg-marca-100 text-sm font-semibold text-marca-700">@iniciales</span>
+                <form asp-controller="Cuenta" asp-action="Logout" method="post">
+                    <button class="btn-fantasma px-2.5" title="Cerrar sesión" aria-label="Cerrar sesión">
+                        @Iconos.Svg("salir", "size-5")
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+}
+
+@* Avisos (TempData) *@
+<div class="pointer-events-none fixed inset-x-0 top-4 z-50 flex flex-col items-center gap-3 px-4 sm:items-end sm:px-6">
+    @if (TempData["Ok"] is string ok)
+    {
+        <div class="toast" data-toast role="status">
+            <span class="text-emerald-500">@Iconos.Svg("ok", "size-6")</span>
+            <p class="flex-1 pt-0.5 text-sm text-slate-700">@ok</p>
+            <button type="button" class="text-slate-400 hover:text-slate-600" data-toast-cerrar aria-label="Cerrar">@Iconos.Svg("cerrar", "size-5")</button>
+        </div>
+    }
+    @if (TempData["Error"] is string err)
+    {
+        <div class="toast" data-toast role="alert">
+            <span class="text-rose-500">@Iconos.Svg("alerta", "size-6")</span>
+            <p class="flex-1 pt-0.5 text-sm text-slate-700">@err</p>
+            <button type="button" class="text-slate-400 hover:text-slate-600" data-toast-cerrar aria-label="Cerrar">@Iconos.Svg("cerrar", "size-5")</button>
+        </div>
+    }
+</div>
+
+@if (autenticado)
+{
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        @RenderBody()
+    </main>
+}
+else
+{
+    @RenderBody()
+}
+
+@* Modal de confirmación compartido (formularios con data-confirmar) *@
+<dialog id="modalConfirmar" class="modal max-w-md">
+    <div class="flex gap-4 px-6 pt-6">
+        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-rose-50 text-rose-600">@Iconos.Svg("alerta", "size-6")</span>
+        <div>
+            <h3 class="modal-titulo" data-confirmar-titulo>Confirmar</h3>
+            <p class="mt-1 text-sm text-slate-600" data-confirmar-mensaje></p>
+        </div>
+    </div>
+    <div class="modal-pie mt-6">
+        <button type="button" class="btn-secundario" data-cerrar-modal>Cancelar</button>
+        <button type="button" class="btn-peligro" data-confirmar-ok>Confirmar</button>
+    </div>
+</dialog>
+
+<script type="module" src="~/js/portal.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

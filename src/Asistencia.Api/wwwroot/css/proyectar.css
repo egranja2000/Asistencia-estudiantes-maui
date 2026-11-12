@@ -1,0 +1,43 @@
+/* Pantalla de proyección: pensada para proyector o para compartir pantalla en Zoom/Teams/Meet.
+   Alto contraste y tipografía grande para que se lea en la miniatura de una videollamada. */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #0f2338;
+    color: #fff;
+}
+.proyeccion { min-height: 100vh; display: flex; flex-direction: column; padding: 2vh 3vw; }
+
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; }
+.curso { font-size: clamp(1.2rem, 2.4vw, 2rem); font-weight: 700; }
+.tema { opacity: .7; font-size: clamp(.9rem, 1.4vw, 1.2rem); margin-top: .2rem; }
+.contador { font-size: clamp(1.6rem, 3.5vw, 3rem); font-weight: 800; text-align: right; line-height: 1; }
+.contador small { display: block; font-size: .9rem; font-weight: 400; opacity: .7; margin-top: .3rem; }
+
+.activo { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5vw; flex-wrap: wrap; }
+.qr-caja { background: #fff; padding: 1.2rem; border-radius: 1rem; }
+.qr-caja img { display: block; width: min(56vh, 80vw); height: min(56vh, 80vw); image-rendering: pixelated; }
+.barra-token { height: 8px; background: #e6e6e6; border-radius: 4px; margin-top: .8rem; overflow: hidden; }
+.barra-token div { height: 100%; background: #2fb36d; width: 100%; transition: width 1s linear; }
+
+.lado { max-width: 34rem; }
+.instruccion { font-size: clamp(1.1rem, 2.2vw, 1.8rem); margin: 0 0 .6rem; }
+.instruccion.secundaria { font-size: clamp(.95rem, 1.5vw, 1.2rem); opacity: .75; margin-top: 2rem; }
+.codigo {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: clamp(3rem, 9vw, 8rem); font-weight: 800; letter-spacing: .08em; line-height: 1.1;
+}
+.cambia { opacity: .75; margin: .3rem 0 2rem; font-size: 1.1rem; }
+.cierra { font-size: 1.2rem; }
+.cierra b { color: #ffd166; }
+
+.espera { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: clamp(1.4rem, 3vw, 2.4rem); }
+.espera .sub { font-size: 1rem; opacity: .6; }
+.pulso { width: 28px; height: 28px; border-radius: 50%; background: #2fb36d; animation: pulso 1.6s infinite; margin-bottom: 1.5rem; }
+@keyframes pulso { 0% { box-shadow: 0 0 0 0 rgba(47,179,109,.6); } 70% { box-shadow: 0 0 0 26px rgba(47,179,109,0); } 100% { box-shadow: 0 0 0 0 rgba(47,179,109,0); } }
+
+footer { display: flex; justify-content: space-between; align-items: center; opacity: .6; font-size: .9rem; }
+footer button { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.4); border-radius: .4rem; padding: .35rem .8rem; cursor: pointer; }
+.red.error { color: #ff8a8a; opacity: 1; }
+[hidden] { display: none !important; }

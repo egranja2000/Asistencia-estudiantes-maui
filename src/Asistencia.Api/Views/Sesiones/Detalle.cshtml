@@ -1,0 +1,388 @@
+@model DetalleSesionViewModel
+@using System.Text.Json
+@using Microsoft.Extensions.Hosting
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Env
+@{
+    var s = Model.Sesion;
+    ViewData["Title"] = s.Curso;
+    var cerrada = s.Estado == "Cerrada";
+    var ahora = DateTime.UtcNow;
+    var hayActivo = Model.Checkpoints.Any(k => !k.Cancelado && k.InicioUtc <= ahora && k.FinUtc > ahora);
+    var cuenta = Model.Asistencia.GroupBy(a => a.EstadoFinal).ToDictionary(g => g.Key, g => g.Count());
+    int Cuenta(string estado) => cuenta.GetValueOrDefault(estado);
+    var total = Math.Max(1, Model.Asistencia.Count);
+    string[] estados = [EstadosAsistencia.Presente, EstadosAsistencia.Parcial, EstadosAsistencia.Ausente, EstadosAsistencia.Justificado];
+}
+
+<a asp-controller="Cursos" asp-action="Detalle" asp-route-id="@s.CursoId" class="migas">@Iconos.Svg("atras", "size-4") @s.Curso</a>
+
+@* Cabecera de la sesión *@
+<div class="tarjeta mt-3 mb-6 p-6">
+    <div class="flex flex-wrap items-start justify-between gap-6">
+        <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="@(s.EsOnline ? "modalidad-online" : "modalidad-presencial")">@s.Modalidad</span>
+                <span class="estado-@s.Estado.ToLowerInvariant()">@s.Estado</span>
+                @if (hayActivo)
+                {
+                    <span class="insignia animate-pulse bg-emerald-600 text-white ring-emerald-600">Checkpoint activo</span>
+                }
+            </div>
+            <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900">@(s.Tema ?? "Sesión de clase")</h1>
+            <div class="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-slate-500">
+                <span class="flex items-center gap-1.5">@Iconos.Svg("calendario", "size-4") @Zona.ALocal(s.InicioUtc).ToString("dddd dd 'de' MMMM yyyy")</span>
+                <span class="flex items-center gap-1.5">@Iconos.Svg("reloj", "size-4") @Zona.ALocal(s.InicioUtc).ToString("HH:mm") – @Zona.ALocal(s.FinUtc).ToString("HH:mm")</span>
+                @if (s.EsOnline && !string.IsNullOrEmpty(s.UrlReunion))
+                {
+                    <a href="@s.UrlReunion" target="_blank" rel="noopener" class="btn-enlace">@Iconos.Svg("video", "size-4") Abrir reunión @Iconos.Svg("externo", "size-3.5")</a>
+                }
+                @if (s.ValidarUbicacion)
+                {
+                    <span class="flex items-center gap-1.5">@Iconos.Svg("ubicacion", "size-4") Geocerca @s.RadioMetros m</span>
+                }
+            </div>
+        </div>
+
+        @if (!cerrada)
+        {
+            <div class="flex flex-wrap gap-2">
+                <a class="btn-secundario" asp-action="Proyectar" asp-route-id="@s.SesionId" target="_blank">@Iconos.Svg("pantalla", "size-4") Proyectar</a>
+                <button type="button" class="btn-exito" data-abrir-modal="modalLanzar" disabled="@hayActivo"
+                        title="@(hayActivo ? "Ya hay un checkpoint activo" : "Abrir un checkpoint ahora")">
+                    @Iconos.Svg("play", "size-4") Lanzar checkpoint
+                </button>
+                @if (Env.IsDevelopment())
+                {
+                    <button type="button" class="btn-secundario text-amber-700" data-abrir-modal="modalSimular">@Iconos.Svg("matraz", "size-4") Simular</button>
+                }
+                <form asp-action="Cerrar" asp-route-id="@s.SesionId" method="post"
+                      data-confirmar="Ya no se podrá marcar asistencia y se consolidará el estado de cada estudiante."
+                      data-confirmar-titulo="¿Cerrar la sesión?" data-confirmar-boton="Sí, cerrar sesión">
+                    <button class="btn-peligro-suave">@Iconos.Svg("candado", "size-4") Cerrar sesión</button>
+                </form>
+            </div>
+        }
+    </div>
+
+    @* Resumen visual *@
+    <div class="mt-6 flex h-2.5 overflow-hidden rounded-full bg-slate-100" title="Distribución de estados">
+        <span class="bg-emerald-500" style="width:@(100.0 * Cuenta(EstadosAsistencia.Presente) / total)%"></span>
+        <span class="bg-sky-500" style="width:@(100.0 * Cuenta(EstadosAsistencia.Justificado) / total)%"></span>
+        <span class="bg-amber-400" style="width:@(100.0 * Cuenta(EstadosAsistencia.Parcial) / total)%"></span>
+        <span class="bg-rose-400" style="width:@(100.0 * Cuenta(EstadosAsistencia.Ausente) / total)%"></span>
+    </div>
+    <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <div><dt class="kpi-etiqueta">Matriculados</dt><dd class="text-xl font-bold text-slate-900">@s.Matriculados</dd></div>
+        <div><dt class="kpi-etiqueta flex items-center gap-1.5"><span class="size-2 rounded-full bg-emerald-500"></span>Presentes</dt><dd class="text-xl font-bold text-slate-900">@Cuenta(EstadosAsistencia.Presente)</dd></div>
+        <div><dt class="kpi-etiqueta flex items-center gap-1.5"><span class="size-2 rounded-full bg-amber-400"></span>Parciales</dt><dd class="text-xl font-bold text-slate-900">@Cuenta(EstadosAsistencia.Parcial)</dd></div>
+        <div><dt class="kpi-etiqueta flex items-center gap-1.5"><span class="size-2 rounded-full bg-rose-400"></span>Ausentes</dt><dd class="text-xl font-bold text-slate-900">@Cuenta(EstadosAsistencia.Ausente)</dd></div>
+        <div><dt class="kpi-etiqueta flex items-center gap-1.5"><span class="size-2 rounded-full bg-sky-500"></span>Justificados</dt><dd class="text-xl font-bold text-slate-900">@Cuenta(EstadosAsistencia.Justificado)</dd></div>
+    </dl>
+</div>
+
+<div class="grid gap-6 xl:grid-cols-3">
+    @* Grid: asistencia *@
+    <section class="grid-datos xl:col-span-2" data-grid data-grid-tamano="10" data-grid-archivo="asistencia-@s.CodigoCurso-@Zona.ALocal(s.InicioUtc).ToString("yyyyMMdd")">
+        <div class="grid-barra">
+            <div>
+                <h2 class="tarjeta-titulo">Asistencia</h2>
+                <p class="text-xs text-slate-500">Todos los checkpoints = Presente · al menos uno = Parcial · ninguno = Ausente</p>
+            </div>
+            <div class="flex w-full items-center gap-2 sm:w-auto">
+                <div class="relative flex-1 sm:flex-none">
+                    <span class="pointer-events-none absolute inset-y-0 left-3 grid place-items-center text-slate-400">@Iconos.Svg("buscar", "size-4")</span>
+                    <input type="search" class="grid-buscar" placeholder="Buscar estudiante o estado…" data-grid-buscar />
+                </div>
+                <button type="button" class="btn-secundario px-3" title="Exportar a Excel (CSV)" data-grid-exportar>@Iconos.Svg("descargar", "size-4")</button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="grid-tabla">
+                <thead>
+                <tr>
+                    <th data-ordenable>Estudiante</th>
+                    <th data-ordenable data-tipo="numero" class="text-center">Marcas</th>
+                    <th data-ordenable>Primera marca</th>
+                    <th data-ordenable>Estado</th>
+                    <th data-no-exportar class="text-right">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var a in Model.Asistencia)
+                {
+                    var datosAjuste = JsonSerializer.Serialize(new
+                    {
+                        estudianteId = a.EstudianteId,
+                        nombre = a.Estudiante,
+                        estado = a.EstadoAjuste ?? "",
+                        motivo = a.MotivoAjuste ?? "",
+                        calculado = a.EstadoCalculado
+                    });
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <span class="grid size-9 shrink-0 place-items-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+                                    @string.Concat(a.Estudiante.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => p[0]))
+                                </span>
+                                <div class="min-w-0">
+                                    <div class="truncate font-medium text-slate-900">@a.Estudiante</div>
+                                    <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                                        @a.Identificacion
+                                        <span title="@(a.DeviceIdVinculado is null ? "Sin celular vinculado" : "Celular vinculado")"
+                                              class="@(a.DeviceIdVinculado is null ? "text-slate-300" : "text-emerald-500")">@Iconos.Svg("celular", "size-3.5")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center" data-valor="@a.Validados">
+                            <span class="font-semibold text-slate-900">@a.Validados</span><span class="text-slate-400"> / @a.TotalCheckpoints</span>
+                        </td>
+                        <td data-valor="@(a.PrimeraMarcaUtc?.ToString("O") ?? "")" class="text-slate-500">
+                            @(a.PrimeraMarcaUtc is DateTime pm ? Zona.ALocal(pm).ToString("HH:mm:ss") : "—")
+                        </td>
+                        <td data-exportar="@a.EstadoFinal@(a.EstadoAjuste is null ? "" : " (manual)")">
+                            <span class="estado-@a.EstadoFinal.ToLowerInvariant()">@a.EstadoFinal</span>
+                            @if (a.EstadoAjuste is not null)
+                            {
+                                <div class="mt-1 flex items-center gap-1 whitespace-nowrap text-xs text-slate-500" title="@a.MotivoAjuste">
+                                    @Iconos.Svg("editar", "size-3") Manual (calc. @a.EstadoCalculado)
+                                </div>
+                            }
+                        </td>
+                        <td class="text-right">
+                            <div class="inline-flex items-center gap-1">
+                                <button type="button" class="btn-secundario btn-sm" data-abrir-modal="modalAjuste" data-rellenar="@datosAjuste">
+                                    @Iconos.Svg("editar", "size-3.5") Ajustar
+                                </button>
+                                @if (a.DeviceIdVinculado is not null)
+                                {
+                                    <form asp-controller="Cursos" asp-action="Desvincular" method="post"
+                                          data-confirmar="@a.Estudiante podrá iniciar sesión en un celular nuevo. El actual dejará de funcionar."
+                                          data-confirmar-titulo="¿Desvincular celular?" data-confirmar-boton="Desvincular">
+                                        <input type="hidden" name="cursoId" value="@s.CursoId" />
+                                        <input type="hidden" name="estudianteId" value="@a.EstudianteId" />
+                                        <input type="hidden" name="sesionId" value="@s.SesionId" />
+                                        <button class="btn-fantasma btn-sm px-2" title="Desvincular celular" aria-label="Desvincular celular">@Iconos.Svg("celular", "size-4")</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="inline-block w-8" aria-hidden="true"></span>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <div class="grid-vacio" data-grid-vacio hidden>@(Model.Asistencia.Count == 0 ? "No hay estudiantes matriculados." : "Ningún estudiante coincide con la búsqueda.")</div>
+        <div class="grid-pie" data-grid-pie></div>
+    </section>
+
+    <div class="space-y-6">
+        @* Checkpoints *@
+        <section class="tarjeta">
+            <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                <h2 class="tarjeta-titulo">Checkpoints</h2>
+                <span class="text-xs text-slate-500">@Model.Checkpoints.Count(k => !k.Cancelado) válidos</span>
+            </div>
+            <ol class="divide-y divide-slate-100">
+                @foreach (var k in Model.Checkpoints)
+                {
+                    var activo = !k.Cancelado && k.InicioUtc <= ahora && k.FinUtc > ahora;
+                    var futuro = !k.Cancelado && k.InicioUtc > ahora;
+                    var estadoK = k.Cancelado ? "Cancelado" : activo ? "Activo" : futuro ? "Programado" : "Finalizado";
+                    var avance = s.Matriculados == 0 ? 0 : 100.0 * k.Registrados / s.Matriculados;
+                    <li class="px-5 py-4 @(k.Cancelado ? "opacity-60" : "")">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="grid size-9 shrink-0 place-items-center rounded-xl text-sm font-bold @(activo ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600")">#@k.Orden</span>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="estado-@estadoK.ToLowerInvariant()">@estadoK</span>
+                                        <span class="text-xs text-slate-400">@k.Origen</span>
+                                    </div>
+                                    <div class="mt-1 text-xs text-slate-500 @(k.Cancelado ? "line-through" : "")">
+                                        @Zona.ALocal(k.InicioUtc).ToString("HH:mm:ss") – @Zona.ALocal(k.FinUtc).ToString("HH:mm:ss") · rota cada @k.RotacionSegundos s
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold text-slate-900">@k.Registrados<span class="font-normal text-slate-400">/@s.Matriculados</span></div>
+                                @if (!cerrada && (activo || futuro))
+                                {
+                                    <form asp-action="CancelarCheckpoint" asp-route-id="@s.SesionId" method="post"
+                                          data-confirmar="Los estudiantes ya no podrán marcar en el checkpoint #@k.Orden." data-confirmar-titulo="¿Cancelar checkpoint?" data-confirmar-boton="Cancelar checkpoint">
+                                        <input type="hidden" name="checkpointId" value="@k.CheckpointId" />
+                                        <button class="text-xs font-medium text-rose-600 hover:text-rose-800">Cancelar</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                        @if (!k.Cancelado && !futuro)
+                        {
+                            <div class="barra-progreso mt-3"><span class="@(activo ? "bg-emerald-500" : "bg-marca-500")" style="width:@avance.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                        }
+                    </li>
+                }
+                @if (Model.Checkpoints.Count == 0)
+                {
+                    <li class="px-5 py-10 text-center text-sm text-slate-500">
+                        <span class="mx-auto mb-3 grid size-12 place-items-center rounded-2xl bg-slate-100 text-slate-400">@Iconos.Svg("qr", "size-6")</span>
+                        Sin checkpoints todavía.
+                    </li>
+                }
+            </ol>
+        </section>
+
+        @* Intentos rechazados *@
+        @if (Model.Intentos.Count > 0)
+        {
+            <section class="tarjeta p-5">
+                <h2 class="tarjeta-titulo flex items-center gap-2">@Iconos.Svg("escudo", "size-5 text-amber-500") Intentos rechazados</h2>
+                <ul class="mt-3 space-y-2">
+                    @foreach (var i in Model.Intentos)
+                    {
+                        <li class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
+                            <code class="font-mono text-xs text-slate-700">@i.CodigoError</code>
+                            <span class="font-semibold text-slate-900">× @i.Cantidad</span>
+                        </li>
+                    }
+                </ul>
+                <p class="ayuda">Muchos TOKEN_EXPIRADO o FUERA_DE_RANGO pueden indicar códigos compartidos por chat.</p>
+            </section>
+        }
+    </div>
+</div>
+
+@* ---------------- Modales ---------------- *@
+
+<dialog id="modalAjuste" class="modal">
+    <form asp-action="Ajustar" asp-route-id="@s.SesionId" method="post">
+        <input type="hidden" name="estudianteId" />
+        <div class="modal-cabecera">
+            <div>
+                <h3 class="modal-titulo">Ajustar asistencia</h3>
+                <p class="text-sm text-slate-500"><span data-campo="nombre"></span> · calculado: <b data-campo="calculado"></b></p>
+            </div>
+            <button type="button" class="modal-cerrar" data-cerrar-modal aria-label="Cerrar">@Iconos.Svg("cerrar", "size-5")</button>
+        </div>
+        <div class="modal-cuerpo">
+            <fieldset>
+                <legend class="etiqueta">Estado</legend>
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <label class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm ring-1 ring-slate-200 has-checked:bg-marca-50 has-checked:ring-2 has-checked:ring-marca-500">
+                        <input type="radio" name="estado" value="" class="accent-marca-600" /> Automático
+                    </label>
+                    @foreach (var e in estados)
+                    {
+                        <label class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm ring-1 ring-slate-200 has-checked:bg-marca-50 has-checked:ring-2 has-checked:ring-marca-500">
+                            <input type="radio" name="estado" value="@e" class="accent-marca-600" /> @e
+                        </label>
+                    }
+                </div>
+                <p class="ayuda">«Automático» quita el ajuste y vuelve al estado calculado por los checkpoints.</p>
+            </fieldset>
+            <div>
+                <label for="motivoAjuste" class="etiqueta">Motivo</label>
+                <textarea id="motivoAjuste" name="motivo" rows="3" maxlength="300" class="campo" placeholder="Ej.: certificado médico, falla de red en el aula…"></textarea>
+            </div>
+        </div>
+        <div class="modal-pie">
+            <button type="button" class="btn-secundario" data-cerrar-modal>Cancelar</button>
+            <button class="btn-primario">Guardar ajuste</button>
+        </div>
+    </form>
+</dialog>
+
+@if (!cerrada)
+{
+    <dialog id="modalLanzar" class="modal">
+        <form asp-action="LanzarCheckpoint" asp-route-id="@s.SesionId" method="post">
+            <div class="modal-cabecera">
+                <div class="flex items-center gap-3">
+                    <span class="grid size-10 place-items-center rounded-xl bg-emerald-50 text-emerald-600">@Iconos.Svg("qr", "size-5")</span>
+                    <div>
+                        <h3 class="modal-titulo">Lanzar checkpoint</h3>
+                        <p class="text-sm text-slate-500">Se abre ahora y los estudiantes marcan con el QR o el código.</p>
+                    </div>
+                </div>
+                <button type="button" class="modal-cerrar" data-cerrar-modal aria-label="Cerrar">@Iconos.Svg("cerrar", "size-5")</button>
+            </div>
+            <div class="modal-cuerpo">
+                <div>
+                    <label for="dur" class="etiqueta">Duración</label>
+                    <div class="mb-2 flex flex-wrap gap-2">
+                        @foreach (var (seg, texto) in new[] { (60, "1 min"), (180, "3 min"), (300, "5 min"), (600, "10 min") })
+                        {
+                            <button type="button" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-marca-100 hover:text-marca-700"
+                                    data-poner-valor="dur" data-valor="@seg">@texto</button>
+                        }
+                    </div>
+                    <div class="relative">
+                        <input id="dur" name="duracionSegundos" type="number" min="20" max="1800" class="campo pr-20" value="@Model.DuracionSugeridaSegundos" />
+                        <span class="pointer-events-none absolute inset-y-0 right-3 grid place-items-center text-xs text-slate-400">segundos</span>
+                    </div>
+                </div>
+                <div>
+                    <label for="rot" class="etiqueta">El QR y el código cambian cada</label>
+                    <div class="relative">
+                        <input id="rot" name="rotacionSegundos" type="number" min="10" max="120" class="campo pr-20" value="20" />
+                        <span class="pointer-events-none absolute inset-y-0 right-3 grid place-items-center text-xs text-slate-400">segundos</span>
+                    </div>
+                    <p class="ayuda">Menos segundos = más difícil compartir el código por chat.</p>
+                </div>
+                <label class="flex items-center gap-3 rounded-lg bg-slate-50 p-3 ring-1 ring-slate-200">
+                    <input type="checkbox" name="proyectar" value="true" class="check" checked />
+                    <span class="text-sm text-slate-700">Ir a la pantalla de proyección</span>
+                </label>
+            </div>
+            <div class="modal-pie">
+                <button type="button" class="btn-secundario" data-cerrar-modal>Cancelar</button>
+                <button class="btn-exito">@Iconos.Svg("play", "size-4") Lanzar ahora</button>
+            </div>
+        </form>
+    </dialog>
+
+    @if (Env.IsDevelopment())
+    {
+        <dialog id="modalSimular" class="modal">
+            <form asp-action="Simular" asp-route-id="@s.SesionId" method="post">
+                <div class="modal-cabecera">
+                    <div class="flex items-center gap-3">
+                        <span class="grid size-10 place-items-center rounded-xl bg-amber-50 text-amber-600">@Iconos.Svg("matraz", "size-5")</span>
+                        <div>
+                            <h3 class="modal-titulo">Simular estudiantes</h3>
+                            <p class="text-sm text-slate-500">Solo en desarrollo · usa la misma validación que la app.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="modal-cerrar" data-cerrar-modal aria-label="Cerrar">@Iconos.Svg("cerrar", "size-5")</button>
+                </div>
+                <div class="modal-cuerpo">
+                    <div>
+                        <label for="simPct" class="etiqueta">Estudiantes mock que marcan</label>
+                        <select id="simPct" name="porcentaje" class="campo">
+                            <option value="25">25 %</option>
+                            <option value="50">50 %</option>
+                            <option value="75" selected>75 %</option>
+                            <option value="100">100 %</option>
+                        </select>
+                    </div>
+                    <label class="flex items-center gap-3 rounded-lg bg-slate-50 p-3 ring-1 ring-slate-200">
+                        <input type="checkbox" name="incluirErrores" value="true" class="check" checked />
+                        <span class="text-sm text-slate-700">Incluir intentos inválidos (token vencido, fuera de rango…)</span>
+                    </label>
+                    @if (!hayActivo)
+                    {
+                        <p class="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 ring-1 ring-amber-200">No hay un checkpoint activo: lanza uno primero.</p>
+                    }
+                </div>
+                <div class="modal-pie">
+                    <button type="button" class="btn-secundario" data-cerrar-modal>Cancelar</button>
+                    <button class="btn-aviso">Simular marcaciones</button>
+                </div>
+            </form>
+        </dialog>
+    }
+}

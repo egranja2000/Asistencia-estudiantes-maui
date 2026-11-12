@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Asistencia.Maui.Views.ResultadoPage"
+             Shell.PresentationMode="ModalAnimated">
+
+    <Grid RowDefinitions="*,Auto" Padding="24,24,24,32">
+        <Border Style="{StaticResource Tarjeta}" VerticalOptions="Center" Padding="24,32"
+                StrokeShape="RoundRectangle 28">
+            <VerticalStackLayout Spacing="14">
+                <!-- Halo + círculo (colores asignados en el code-behind) -->
+                <Border x:Name="Halo" WidthRequest="132" HeightRequest="132" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 66" HorizontalOptions="Center">
+                    <Border x:Name="Circulo" WidthRequest="96" HeightRequest="96" StrokeThickness="0"
+                            StrokeShape="RoundRectangle 48" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label x:Name="Icono" FontSize="48" FontAttributes="Bold" TextColor="White"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Border>
+                <Label x:Name="Titulo" FontSize="26" FontAttributes="Bold" HorizontalTextAlignment="Center" Margin="0,6,0,0" />
+                <Label x:Name="Mensaje" FontSize="17" TextColor="{StaticResource TextoMedio}" HorizontalTextAlignment="Center" />
+                <Border BackgroundColor="{StaticResource Fondo}" StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                        Padding="14,10" x:Name="CajaDetalle">
+                    <Label x:Name="Detalle" Style="{StaticResource Suave}" FontSize="14" HorizontalTextAlignment="Center" />
+                </Border>
+            </VerticalStackLayout>
+        </Border>
+
+        <Button Grid.Row="1" x:Name="BotonContinuar" Clicked="OnContinuar" />
+    </Grid>
+</ContentPage>

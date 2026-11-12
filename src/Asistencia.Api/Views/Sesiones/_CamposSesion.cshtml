@@ -1,0 +1,79 @@
+@model CrearSesionViewModel
+@* Campos del formulario "Nueva sesión". Se usa en el modal del curso y en la página Sesiones/Crear. *@
+<input type="hidden" asp-for="CursoId" />
+
+<div>
+    <span class="etiqueta">Modalidad</span>
+    <div class="segmento" data-modalidad>
+        <input type="radio" class="sr-only" asp-for="Modalidad" value="@Modalidades.Presencial" id="modPres" />
+        <label for="modPres" class="flex items-center gap-2">@Iconos.Svg("ubicacion", "size-4") Presencial</label>
+        <input type="radio" class="sr-only" asp-for="Modalidad" value="@Modalidades.Online" id="modOnl" />
+        <label for="modOnl" class="flex items-center gap-2">@Iconos.Svg("video", "size-4") Online</label>
+    </div>
+</div>
+
+<div>
+    <label asp-for="Tema" class="etiqueta">Tema <span class="font-normal text-slate-400">(opcional)</span></label>
+    <input asp-for="Tema" class="campo" placeholder="Ej.: Normalización de bases de datos" />
+</div>
+
+<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+    <div class="col-span-2 sm:col-span-1">
+        <label asp-for="Fecha" class="etiqueta">Fecha</label>
+        <input asp-for="Fecha" type="date" class="campo" />
+    </div>
+    <div>
+        <label asp-for="HoraInicio" class="etiqueta">Inicio</label>
+        <input asp-for="HoraInicio" type="time" class="campo" />
+    </div>
+    <div>
+        <label asp-for="HoraFin" class="etiqueta">Fin</label>
+        <input asp-for="HoraFin" type="time" class="campo" />
+    </div>
+</div>
+
+<div class="solo-online rounded-xl bg-violet-50/60 p-4 ring-1 ring-violet-100">
+    <label asp-for="UrlReunion" class="etiqueta">Enlace de la reunión</label>
+    <input asp-for="UrlReunion" class="campo" placeholder="https://zoom.us/j/... · Teams · Meet" />
+    <span asp-validation-for="UrlReunion" class="error-campo"></span>
+</div>
+
+<div class="solo-presencial rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+    <label class="flex items-start gap-3">
+        <input asp-for="ValidarUbicacion" class="check mt-0.5" />
+        <span>
+            <span class="block text-sm font-medium text-slate-800">Exigir ubicación dentro del aula (GPS)</span>
+            <span class="block text-xs text-slate-500">El GPS en interiores puede variar 20–50 m; se suma la precisión reportada como tolerancia.</span>
+        </span>
+    </label>
+    <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div><label asp-for="Latitud" class="etiqueta text-xs">Latitud</label><input asp-for="Latitud" class="campo" step="0.000001" /></div>
+        <div><label asp-for="Longitud" class="etiqueta text-xs">Longitud</label><input asp-for="Longitud" class="campo" step="0.000001" /></div>
+        <div class="col-span-2 sm:col-span-1"><label asp-for="RadioMetros" class="etiqueta text-xs">Radio (m)</label><input asp-for="RadioMetros" class="campo" /></div>
+    </div>
+</div>
+
+<div>
+    <div class="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-800">@Iconos.Svg("qr", "size-4 text-marca-600") Checkpoints</div>
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div class="col-span-2 sm:col-span-1">
+            <label asp-for="CheckpointsAutomaticos" class="etiqueta">Automáticos</label>
+            <select asp-for="CheckpointsAutomaticos" class="campo">
+                @for (var i = 0; i <= 5; i++)
+                {
+                    <option value="@i">@(i == 0 ? "Ninguno (los lanzo yo)" : $"{i} aleatorio{(i > 1 ? "s" : "")}")</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label asp-for="DuracionCheckpointSegundos" class="etiqueta">Duración (s)</label>
+            <input asp-for="DuracionCheckpointSegundos" class="campo" data-duracion />
+        </div>
+        <div>
+            <label asp-for="RotacionSegundos" class="etiqueta">Rota cada (s)</label>
+            <input asp-for="RotacionSegundos" class="campo" />
+        </div>
+    </div>
+    <p class="ayuda solo-online">Recomendado online: 3 checkpoints automáticos de 60 s. El estudiante no sabe cuándo aparecerán.</p>
+    <p class="ayuda solo-presencial">Recomendado presencial: lanzar 1 checkpoint al inicio con duración de 5 minutos.</p>
+</div>

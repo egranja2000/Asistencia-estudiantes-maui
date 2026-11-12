@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Asistencia.Maui.ViewModels"
+             x:Class="Asistencia.Maui.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Shell.NavBarIsVisible="False"
+             Background="{StaticResource DegradadoMarca}">
+
+    <ScrollView>
+        <Grid RowDefinitions="Auto,Auto,Auto" Padding="24,56,24,28" RowSpacing="24" MaximumWidthRequest="460">
+
+            <!-- Marca -->
+            <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                <Border WidthRequest="72" HeightRequest="72" StrokeShape="RoundRectangle 22"
+                        BackgroundColor="#26FFFFFF" Stroke="#40FFFFFF" StrokeThickness="1"
+                        HorizontalOptions="Center">
+                    <Label Text="✓" FontSize="38" FontAttributes="Bold" TextColor="White"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <Label Text="Asistencia" FontSize="32" FontAttributes="Bold" TextColor="White"
+                       HorizontalTextAlignment="Center" Margin="0,6,0,0" />
+                <Label Text="Registra tu asistencia a clases presenciales y online en segundos."
+                       TextColor="#C7D2FE" FontSize="15" HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- Formulario -->
+            <Border Grid.Row="1" Style="{StaticResource Tarjeta}" Padding="22" StrokeShape="RoundRectangle 24"
+                    Stroke="Transparent">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Iniciar sesión" Style="{StaticResource Subtitulo}" FontSize="20" />
+                    <Label Text="Usa tus credenciales institucionales." Style="{StaticResource Suave}" Margin="0,0,0,10" />
+
+                    <Label Text="Correo o identificación" Style="{StaticResource Etiqueta}" />
+                    <Border Style="{StaticResource CampoTexto}">
+                        <Entry Text="{Binding Usuario}" Keyboard="Email" IsSpellCheckEnabled="False"
+                               Placeholder="nombre@universidad.edu" ReturnType="Next" />
+                    </Border>
+
+                    <Label Text="Contraseña" Style="{StaticResource Etiqueta}" Margin="0,8,0,0" />
+                    <Border Style="{StaticResource CampoTexto}">
+                        <Entry Text="{Binding Password}" IsPassword="True" ReturnType="Go" Placeholder="••••••••"
+                               ReturnCommand="{Binding IngresarCommand}" />
+                    </Border>
+
+                    <Border BackgroundColor="{StaticResource PeligroSuave}" StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12" Padding="12,10" Margin="0,6,0,0"
+                            IsVisible="{Binding Error, Converter={StaticResource NoVacio}}">
+                        <Label Text="{Binding Error}" TextColor="#BE123C" FontSize="14" />
+                    </Border>
+
+                    <Button Text="Ingresar" Command="{Binding IngresarCommand}" Margin="0,14,0,0"
+                            Shadow="{StaticResource SombraMarca}" />
+                    <ActivityIndicator IsRunning="{Binding Ocupado}" IsVisible="{Binding Ocupado}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Aviso -->
+            <Border Grid.Row="2" BackgroundColor="#1AFFFFFF" Stroke="#33FFFFFF" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 16" Padding="14,12">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Label Text="🔒" FontSize="16" VerticalOptions="Start" />
+                    <Label Grid.Column="1" TextColor="#E0E7FF" FontSize="13"
+                           Text="Tu cuenta quedará vinculada a este celular. Si cambias de equipo, pide a tu docente que la desvincule." />
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollView>
+</ContentPage>

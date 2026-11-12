@@ -1,0 +1,61 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Ingresar";
+}
+<div class="grid min-h-screen lg:grid-cols-2">
+    @* Panel de marca *@
+    <div class="relative hidden overflow-hidden bg-linear-to-br from-marca-700 via-marca-800 to-marca-950 lg:flex lg:flex-col lg:justify-between lg:p-12">
+        <div class="absolute -right-24 -top-24 size-96 rounded-full bg-white/5"></div>
+        <div class="absolute -bottom-32 -left-16 size-96 rounded-full bg-white/5"></div>
+
+        <div class="relative flex items-center gap-3 text-white">
+            <span class="grid size-11 place-items-center rounded-xl bg-white/15 ring-1 ring-white/20">@Iconos.Svg("birrete", "size-6")</span>
+            <span class="text-lg font-semibold">Asistencia</span>
+        </div>
+
+        <div class="relative max-w-md">
+            <h2 class="text-4xl font-bold leading-tight tracking-tight text-white">Registro de asistencia simple y seguro.</h2>
+            <p class="mt-4 text-lg text-marca-200">Proyecta un QR dinámico y tus estudiantes marcan desde la app, en clases presenciales u online.</p>
+            <ul class="mt-8 space-y-3 text-marca-100">
+                <li class="flex items-center gap-3">@Iconos.Svg("qr", "size-5 text-marca-300") QR y código que cambian cada 20 segundos</li>
+                <li class="flex items-center gap-3">@Iconos.Svg("ubicacion", "size-5 text-marca-300") Validación por ubicación en el aula</li>
+                <li class="flex items-center gap-3">@Iconos.Svg("grafico", "size-5 text-marca-300") Porcentajes de asistencia al instante</li>
+            </ul>
+        </div>
+
+        <p class="relative text-sm text-marca-300">© @DateTime.Now.Year · Asistencia de Estudiantes</p>
+    </div>
+
+    @* Formulario *@
+    <div class="flex items-center justify-center px-6 py-12">
+        <div class="w-full max-w-sm">
+            <div class="mb-8 flex items-center gap-3 lg:hidden">
+                <span class="grid size-11 place-items-center rounded-xl bg-marca-600 text-white">@Iconos.Svg("birrete", "size-6")</span>
+                <span class="text-lg font-semibold text-slate-900">Asistencia</span>
+            </div>
+
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Bienvenido</h1>
+            <p class="mt-1 text-sm text-slate-500">Ingresa al portal docente. Los estudiantes marcan desde la app móvil.</p>
+
+            <form asp-action="Login" method="post" class="mt-8 space-y-5">
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div asp-validation-summary="ModelOnly"></div>
+
+                <div>
+                    <label asp-for="Usuario" class="etiqueta">Correo o identificación</label>
+                    <input asp-for="Usuario" class="campo py-2.5" autocomplete="username" autofocus placeholder="docente@institucion.edu" />
+                    <span asp-validation-for="Usuario" class="error-campo"></span>
+                </div>
+                <div>
+                    <label asp-for="Password" class="etiqueta">Contraseña</label>
+                    <input asp-for="Password" class="campo py-2.5" autocomplete="current-password" placeholder="••••••••" />
+                    <span asp-validation-for="Password" class="error-campo"></span>
+                </div>
+
+                <button class="btn-primario w-full py-2.5">
+                    @Iconos.Svg("candado", "size-4") Ingresar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

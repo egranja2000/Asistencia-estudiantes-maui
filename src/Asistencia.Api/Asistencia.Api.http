@@ -1,0 +1,133 @@
+### =====================================================================
+### Pruebas de la API — Visual Studio 2022 (17.12+) o VS Code + "REST Client"
+### Requisitos: 03_datos_mock.sql ejecutado y la API corriendo.
+###
+### Este archivo usa a CARLOS. Para probar con el celular usa a LUCÍA o DIEGO
+### (un estudiante = un dispositivo). Para liberar a Carlos:  EXEC demo.sp_DesvincularDemo;
+### =====================================================================
+
+@api = http://localhost:5080
+@device = pruebas-http-carlos-0001
+
+### ---------------------------------------------------------------------
+### A. AUTENTICACIÓN
+### ---------------------------------------------------------------------
+
+### A1. Login correcto → 200 + token (vincula el dispositivo la primera vez)
+# @name login
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "usuario": "carlos@demo.edu", "password": "Demo123*", "deviceId": "{{device}}" }
+
+### A2. Login con cédula en vez de correo → 200
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "usuario": "0900000002", "password": "Demo123*", "deviceId": "{{device}}" }
+
+### A3. Contraseña incorrecta → 400 "Usuario o contraseña incorrectos."
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "usuario": "carlos@demo.edu", "password": "mala", "deviceId": "{{device}}" }
+
+### A4. Mismo estudiante desde OTRO celular → 400 "Tu cuenta está vinculada a otro dispositivo…"
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "usuario": "carlos@demo.edu", "password": "Demo123*", "deviceId": "otro-celular-9999" }
+
+### A5. OTRO estudiante desde el celular de Carlos → 400 "Este dispositivo ya está vinculado a la cuenta de otro estudiante."
+###     (Diego no queda vinculado: el índice único lo impide, así que puedes seguir usándolo en el celular)
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "usuario": "diego@demo.edu", "password": "Demo123*", "deviceId": "{{device}}" }
+
+### A6. Un docente intenta entrar a la app → 400 "Esta app es solo para estudiantes…"
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "usuario": "docente@demo.edu", "password": "Demo123*", "deviceId": "docente-device-0001" }
+
+### A7. Sin token → 401
+GET {{api}}/api/estudiante/checkpoints-activos
+
+### ---------------------------------------------------------------------
+### B. CONSULTAS DEL ESTUDIANTE (ejecuta A1 antes)
+### ---------------------------------------------------------------------
+@token = {{login.response.body.$.token}}
+
+### B1. Checkpoints abiertos ahora → debe listar PROG-101 (S1) y, si ya pasaron ~12 min, BD-201 (S2)
+GET {{api}}/api/estudiante/checkpoints-activos
+Authorization: Bearer {{token}}
+
+### B2. Historial 30 días → mezcla de Presente / Parcial / Ausente / Justificado
+GET {{api}}/api/estudiante/historial?dias=30
+Authorization: Bearer {{token}}
+
+### ---------------------------------------------------------------------
+### C. MARCACIÓN
+### Abre la proyección de S1 en la web (Sesiones → Abrir proyección) y copia
+### el código de 6 dígitos ANTES de que cambie (tienes ~20-40 s).
+### ---------------------------------------------------------------------
+@codigo = 000000
+
+### C1. Código correcto → "REGISTRADO"
+POST {{api}}/api/estudiante/marcar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "metodo": "Codigo", "valor": "{{codigo}}" }
+
+### C2. Repetir → "YA_REGISTRADO" (exito = true)
+POST {{api}}/api/estudiante/marcar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "metodo": "Codigo", "valor": "{{codigo}}" }
+
+### C3. Código con espacios "123 456" → se acepta el formato (luego CODIGO_INVALIDO si no coincide)
+POST {{api}}/api/estudiante/marcar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "metodo": "Codigo", "valor": "123 456" }
+
+### C4. Código de 5 dígitos → "CODIGO_INVALIDO" (El código debe tener 6 dígitos.)
+POST {{api}}/api/estudiante/marcar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "metodo": "Codigo", "valor": "12345" }
+
+### C5. QR con formato correcto pero firma falsa → "QR_INVALIDO"
+POST {{api}}/api/estudiante/marcar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "metodo": "QR", "valor": "ASIS1.1.99999999.AAAAAAAAAAAAAAAAAAAAAA" }
+
+### C6. QR de otra app → "QR_INVALIDO"
+POST {{api}}/api/estudiante/marcar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "metodo": "QR", "valor": "https://www.google.com" }
+
+### C7. Método inexistente → "QR_INVALIDO" (Método no soportado.)
+POST {{api}}/api/estudiante/marcar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "metodo": "NFC", "valor": "abc" }
+
+### C8. Valor vacío → 400
+POST {{api}}/api/estudiante/marcar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "metodo": "Codigo", "valor": "" }
+
+### C9. Rate limit: ejecuta C4 más de 10 veces en un minuto → 429 Too Many Requests

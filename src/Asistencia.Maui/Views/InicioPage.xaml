@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Asistencia.Maui.ViewModels"
+             x:Class="Asistencia.Maui.Views.InicioPage"
+             x:DataType="vm:InicioViewModel"
+             Shell.NavBarIsVisible="False"
+             Title="Mi asistencia">
+
+    <RefreshView IsRefreshing="{Binding Refrescando}" Command="{Binding RefrescarCommand}"
+                 RefreshColor="{StaticResource Marca}">
+        <ScrollView>
+            <VerticalStackLayout Spacing="0">
+
+                <!-- Cabecera con degradado -->
+                <Border Background="{StaticResource DegradadoMarca}" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 0,0,28,28" Padding="20,44,20,64">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                        <Label Text="Mi asistencia" TextColor="#C7D2FE" FontSize="14" />
+                        <Label Grid.Row="1" Text="{Binding Saludo}" TextColor="White" FontSize="26"
+                               FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                        <Button Grid.Column="1" Grid.RowSpan="2" Text="Salir" Style="{StaticResource BotonClaro}"
+                                Command="{Binding SalirCommand}" VerticalOptions="Center" Padding="16,0" />
+                    </Grid>
+                </Border>
+
+                <VerticalStackLayout Padding="18,0,18,28" Spacing="10" Margin="0,-44,0,0">
+
+                    <!-- Acciones principales -->
+                    <Border Style="{StaticResource Tarjeta}" Padding="18" StrokeShape="RoundRectangle 22">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Marcar asistencia" Style="{StaticResource Subtitulo}" />
+                            <Button Text="📷  Escanear QR" Command="{Binding EscanearCommand}"
+                                    Shadow="{StaticResource SombraMarca}" />
+                            <Button Text="🔢  Ingresar código de 6 dígitos" Style="{StaticResource BotonSecundario}"
+                                    Command="{Binding IngresarCodigoCommand}" />
+                            <Label Text="¿Clase online y la sigues desde este celular? Usa el código que aparece junto al QR."
+                                   Style="{StaticResource Suave}" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border BackgroundColor="{StaticResource PeligroSuave}" StrokeThickness="0"
+                            StrokeShape="RoundRectangle 14" Padding="14,10"
+                            IsVisible="{Binding Mensaje, Converter={StaticResource NoVacio}}">
+                        <Label Text="{Binding Mensaje}" TextColor="#BE123C" FontSize="14" />
+                    </Border>
+
+                    <!-- Checkpoints abiertos ahora -->
+                    <Label Text="Abiertos ahora" Style="{StaticResource Seccion}" />
+                    <Border Style="{StaticResource Tarjeta}" Padding="16" Shadow="{x:Null}"
+                            BackgroundColor="Transparent" StrokeDashArray="4,3"
+                            IsVisible="{Binding HayActivos, Converter={StaticResource Negar}}">
+                        <Label Text="No hay checkpoints abiertos en tus cursos." Style="{StaticResource Suave}"
+                               HorizontalTextAlignment="Center" />
+                    </Border>
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Activos}" Spacing="8">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:CheckpointItem">
+                                <Border Style="{StaticResource Tarjeta}" Padding="0">
+                                    <Grid ColumnDefinitions="5,*,Auto" ColumnSpacing="12" Padding="0,0,14,0">
+                                        <BoxView Color="{StaticResource Marca}" />
+                                        <VerticalStackLayout Grid.Column="1" Padding="0,14" Spacing="2">
+                                            <Label Text="{Binding Curso}" FontAttributes="Bold" />
+                                            <Label Text="{Binding Detalle}" Style="{StaticResource Suave}" />
+                                        </VerticalStackLayout>
+                                        <Border Grid.Column="2" Style="{StaticResource Chip}" BackgroundColor="{Binding FondoEstado}">
+                                            <Label Text="{Binding Estado}" TextColor="{Binding ColorEstado}" Style="{StaticResource ChipTexto}" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <!-- Historial -->
+                    <Label Text="Últimos 30 días" Style="{StaticResource Seccion}" />
+                    <Border Style="{StaticResource Tarjeta}" Padding="0">
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Historial}">
+                            <BindableLayout.EmptyView>
+                                <Label Text="Aún no tienes clases registradas." Style="{StaticResource Suave}"
+                                       HorizontalTextAlignment="Center" Padding="16,20" />
+                            </BindableLayout.EmptyView>
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:HistorialItem">
+                                    <VerticalStackLayout>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" Padding="16,12">
+                                            <VerticalStackLayout Spacing="2">
+                                                <Label Text="{Binding Curso}" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                                <Label Style="{StaticResource Suave}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding Fecha}" />
+                                                            <Span Text=" · " />
+                                                            <Span Text="{Binding Detalle}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </VerticalStackLayout>
+                                            <Border Grid.Column="1" Style="{StaticResource Chip}" BackgroundColor="{Binding FondoEstado}">
+                                                <Label Text="{Binding Estado}" TextColor="{Binding ColorEstado}" Style="{StaticResource ChipTexto}" />
+                                            </Border>
+                                        </Grid>
+                                        <BoxView HeightRequest="1" Color="#F1F5F9" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

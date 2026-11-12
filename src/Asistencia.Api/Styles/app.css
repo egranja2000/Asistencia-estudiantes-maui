@@ -1,0 +1,135 @@
+/*
+ * Portal docente: Tailwind CSS v4.
+ * Fuente:   Styles/app.css  (este archivo)
+ * Salida:   wwwroot/css/app.css  (compilado, se versiona para no depender de Node al ejecutar)
+ * Recompilar: npm install && npm run css:build   (o npm run css:watch mientras editas vistas)
+ */
+@import "tailwindcss";
+
+@source "../Views";
+@source "../wwwroot/js";
+
+@theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+
+    /* Color de marca (índigo profundo) */
+    --color-marca-50: #eef2ff;
+    --color-marca-100: #e0e7ff;
+    --color-marca-200: #c7d2fe;
+    --color-marca-300: #a5b4fc;
+    --color-marca-400: #818cf8;
+    --color-marca-500: #6366f1;
+    --color-marca-600: #4f46e5;
+    --color-marca-700: #4338ca;
+    --color-marca-800: #3730a3;
+    --color-marca-900: #312e81;
+    --color-marca-950: #1e1b4b;
+}
+
+@utility btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold
+               transition focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer whitespace-nowrap;
+}
+@utility campo {
+        @apply block w-full rounded-lg border-0 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300
+               placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-marca-600 focus:outline-none;
+}
+@utility tarjeta { @apply rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/70; }
+@utility insignia { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset whitespace-nowrap; }
+
+@layer base {
+    html { -webkit-font-smoothing: antialiased; }
+    body { @apply bg-slate-50 text-slate-800; }
+    [hidden] { display: none !important; }
+    ::selection { @apply bg-marca-200 text-marca-950; }
+}
+
+@layer components {
+    /* ---------- Botones ---------- */
+    .btn-primario { @apply btn bg-marca-600 text-white shadow-sm hover:bg-marca-700 focus-visible:outline-marca-600; }
+    .btn-secundario { @apply btn bg-white text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50; }
+    .btn-exito { @apply btn bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 focus-visible:outline-emerald-600; }
+    .btn-peligro { @apply btn bg-rose-600 text-white shadow-sm hover:bg-rose-700 focus-visible:outline-rose-600; }
+    .btn-peligro-suave { @apply btn bg-white text-rose-600 ring-1 ring-inset ring-rose-200 hover:bg-rose-50; }
+    .btn-aviso { @apply btn bg-amber-500 text-white shadow-sm hover:bg-amber-600; }
+    .btn-fantasma { @apply btn text-slate-600 hover:bg-slate-100 hover:text-slate-900; }
+    /* Tamaño chico: va después de las variantes para sobrescribir el padding */
+    .btn-sm { @apply px-3 py-1.5 text-xs; }
+    .btn-enlace { @apply inline-flex items-center gap-1 text-sm font-medium text-marca-600 hover:text-marca-800 cursor-pointer; }
+
+    /* ---------- Formularios ---------- */
+    .etiqueta { @apply mb-1.5 block text-sm font-medium text-slate-700; }
+    .ayuda { @apply mt-1.5 text-xs text-slate-500; }
+    .error-campo { @apply mt-1 block text-xs font-medium text-rose-600; }
+    .validation-summary-errors { @apply mb-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700 ring-1 ring-rose-200; }
+    .validation-summary-errors ul { @apply list-inside list-disc; }
+    .validation-summary-valid { @apply hidden; }
+    .check { @apply size-4 rounded border-slate-300 text-marca-600 accent-marca-600; }
+
+    /* Selector segmentado (radio como botones) */
+    .segmento { @apply inline-flex rounded-lg bg-slate-100 p-1; }
+    .segmento label { @apply cursor-pointer rounded-md px-4 py-1.5 text-sm font-medium text-slate-600 transition; }
+    .segmento input:checked + label { @apply bg-white text-marca-700 shadow-sm; }
+
+    /* ---------- Tarjetas ---------- */
+    .tarjeta-cuerpo { @apply p-5 sm:p-6; }
+    .tarjeta-titulo { @apply text-base font-semibold text-slate-900; }
+    .kpi { @apply tarjeta flex items-center gap-4 p-5; }
+    .kpi-icono { @apply grid size-11 shrink-0 place-items-center rounded-xl; }
+    .kpi-valor { @apply text-2xl font-bold tracking-tight text-slate-900; }
+    .kpi-etiqueta { @apply text-xs font-medium uppercase tracking-wide text-slate-500; }
+
+    /* ---------- Insignias de estado ---------- */
+    .insignia::before, [class^="estado-"]::before, [class*=" estado-"]::before,
+    .modalidad-online::before, .modalidad-presencial::before { content: ""; @apply size-1.5 rounded-full bg-current; }
+    .estado-presente, .estado-abierta, .estado-activo { @apply insignia bg-emerald-50 text-emerald-700 ring-emerald-600/20; }
+    .estado-parcial, .estado-programado { @apply insignia bg-amber-50 text-amber-700 ring-amber-600/20; }
+    .estado-ausente, .estado-cancelado { @apply insignia bg-rose-50 text-rose-700 ring-rose-600/20; }
+    .estado-justificado { @apply insignia bg-sky-50 text-sky-700 ring-sky-600/20; }
+    .estado-pendiente, .estado-programada, .estado-cerrada, .estado-finalizado { @apply insignia bg-slate-100 text-slate-600 ring-slate-500/20; }
+    .modalidad-online { @apply insignia bg-violet-50 text-violet-700 ring-violet-600/20; }
+    .modalidad-presencial { @apply insignia bg-marca-50 text-marca-700 ring-marca-600/20; }
+
+    /* ---------- Grid de datos (wwwroot/js/grid.js) ---------- */
+    .grid-datos { @apply tarjeta overflow-hidden; }
+    .grid-barra { @apply flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 sm:px-5; }
+    .grid-buscar { @apply campo w-full pl-9 sm:w-72; }
+    .grid-tabla { @apply min-w-full divide-y divide-slate-200 text-sm; }
+    .grid-tabla thead { @apply bg-slate-50/80; }
+    .grid-tabla th { @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 whitespace-nowrap sm:px-5; }
+    .grid-tabla th[data-ordenable] { @apply cursor-pointer select-none hover:text-slate-800; }
+    .grid-tabla th .flecha { @apply ml-1 inline-block text-slate-300; }
+    .grid-tabla th[aria-sort="ascending"] .flecha, .grid-tabla th[aria-sort="descending"] .flecha { @apply text-marca-600; }
+    .grid-tabla td { @apply px-4 py-3 text-slate-700 sm:px-5; }
+    .grid-tabla tbody { @apply divide-y divide-slate-100 bg-white; }
+    .grid-tabla tbody tr { @apply transition-colors hover:bg-slate-50/70; }
+    .grid-pie { @apply flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-slate-50/60 px-4 py-3 text-xs text-slate-500 sm:px-5; }
+    .grid-pagina { @apply inline-grid size-8 place-items-center rounded-md text-sm font-medium text-slate-600 hover:bg-white hover:shadow-sm disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:shadow-none cursor-pointer; }
+    .grid-pagina[aria-current="page"] { @apply bg-white text-marca-700 shadow-sm ring-1 ring-slate-200; }
+    .grid-vacio { @apply px-5 py-12 text-center text-sm text-slate-500; }
+
+    /* ---------- Modales (<dialog>) ---------- */
+    .modal {
+        @apply m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl bg-white p-0 text-slate-800 shadow-2xl ring-1 ring-slate-900/5
+               backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm;
+    }
+    .modal[open] { animation: modal-entra .18s ease-out; }
+    .modal-lg { @apply max-w-2xl; }
+    .modal-cabecera { @apply flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-4; }
+    .modal-titulo { @apply text-lg font-semibold text-slate-900; }
+    .modal-cuerpo { @apply max-h-[70vh] space-y-5 overflow-y-auto px-6 py-5; }
+    .modal-pie { @apply flex flex-col-reverse gap-2 border-t border-slate-100 bg-slate-50/70 px-6 py-4 sm:flex-row sm:justify-end; }
+    .modal-cerrar { @apply -mr-2 grid size-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer; }
+
+    /* ---------- Avisos flotantes ---------- */
+    .toast { @apply pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl bg-white p-4 shadow-lg ring-1 ring-slate-900/5; animation: toast-entra .25s ease-out; }
+
+    /* ---------- Varios ---------- */
+    .migas { @apply inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-marca-700; }
+    .barra-progreso { @apply h-1.5 w-full overflow-hidden rounded-full bg-slate-100; }
+    .barra-progreso > span { @apply block h-full rounded-full; }
+}
+
+@keyframes modal-entra { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes toast-entra { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }

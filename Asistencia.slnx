@@ -1,0 +1,28 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Asistencia.Shared/Asistencia.Shared.csproj" />
+    <Project Path="src/Asistencia.Api/Asistencia.Api.csproj" />
+    <Project Path="src/Asistencia.Maui/Asistencia.Maui.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Asistencia.Api.Tests/Asistencia.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/database/">
+    <File Path="database/01_esquema.sql" />
+    <File Path="database/02_datos_demo.sql" />
+    <File Path="database/03_datos_mock.sql" />
+    <File Path="database/04_utilidades_prueba.sql" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/GUIA_PRUEBAS.md" />
+  </Folder>
+</Solution>

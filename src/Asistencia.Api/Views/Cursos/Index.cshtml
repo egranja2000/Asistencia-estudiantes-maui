@@ -1,0 +1,67 @@
+@model IReadOnlyList<CursoRow>
+@{
+    ViewData["Title"] = "Mis cursos";
+    string[] acentos = ["from-marca-500 to-marca-700", "from-sky-500 to-cyan-600", "from-violet-500 to-fuchsia-600", "from-emerald-500 to-teal-600", "from-amber-500 to-orange-600"];
+}
+<div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Mis cursos</h1>
+        <p class="mt-1 text-sm text-slate-500">
+            @Model.Count @(Model.Count == 1 ? "curso asignado" : "cursos asignados")
+            · @Model.Sum(c => c.Matriculados) estudiantes en total
+        </p>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="tarjeta grid place-items-center px-6 py-16 text-center">
+        <span class="grid size-14 place-items-center rounded-2xl bg-slate-100 text-slate-400">@Iconos.Svg("birrete", "size-7")</span>
+        <h2 class="mt-4 font-semibold text-slate-900">No tienes cursos asignados</h2>
+        <p class="mt-1 text-sm text-slate-500">Cuando el administrador te asigne cursos, aparecerán aquí.</p>
+    </div>
+}
+
+<div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    @for (var i = 0; i < Model.Count; i++)
+    {
+        var c = Model[i];
+        <a asp-action="Detalle" asp-route-id="@c.CursoId"
+           class="group tarjeta relative flex flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-marca-200">
+            <div class="h-1.5 bg-linear-to-r @acentos[i % acentos.Length]"></div>
+            <div class="flex flex-1 flex-col p-6">
+                <div class="flex items-start justify-between gap-3">
+                    <span class="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs font-semibold text-slate-600">@c.Codigo</span>
+                    <span class="text-xs font-medium text-slate-400">@c.Periodo</span>
+                </div>
+                <h2 class="mt-4 text-lg font-semibold leading-snug text-slate-900 group-hover:text-marca-700">@c.Nombre</h2>
+
+                <dl class="mt-5 grid grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-slate-50 px-3 py-2.5">
+                        <dt class="flex items-center gap-1.5 text-xs text-slate-500">@Iconos.Svg("usuarios", "size-4") Estudiantes</dt>
+                        <dd class="mt-0.5 text-lg font-bold text-slate-900">@c.Matriculados</dd>
+                    </div>
+                    <div class="rounded-xl bg-slate-50 px-3 py-2.5">
+                        <dt class="flex items-center gap-1.5 text-xs text-slate-500">@Iconos.Svg("calendario", "size-4") Sesiones</dt>
+                        <dd class="mt-0.5 text-lg font-bold text-slate-900">@c.Sesiones</dd>
+                    </div>
+                </dl>
+
+                <div class="mt-auto flex items-center justify-between pt-5 text-sm">
+                    @if (c.ProximaSesionUtc is DateTime prox)
+                    {
+                        <span class="flex items-center gap-1.5 text-slate-600">
+                            @Iconos.Svg("reloj", "size-4 text-marca-500")
+                            Próxima: <b class="font-semibold">@Zona.ALocal(prox).ToString("ddd dd/MM HH:mm")</b>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-slate-400">Sin sesiones programadas</span>
+                    }
+                    <span class="text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-marca-600">@Iconos.Svg("derecha", "size-5")</span>
+                </div>
+            </div>
+        </a>
+    }
+</div>

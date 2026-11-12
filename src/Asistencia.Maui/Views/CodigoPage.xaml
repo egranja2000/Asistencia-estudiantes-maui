@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Se presenta como pantalla modal (sube desde abajo) para el ingreso del código. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Asistencia.Maui.ViewModels"
+             x:Class="Asistencia.Maui.Views.CodigoPage"
+             x:DataType="vm:CodigoViewModel"
+             Shell.PresentationMode="ModalAnimated"
+             Title="Código de asistencia">
+
+    <Grid RowDefinitions="Auto,*" Padding="20,16,20,24">
+
+        <!-- Barra del modal -->
+        <Grid ColumnDefinitions="*,Auto">
+            <Label Text="Código de asistencia" Style="{StaticResource Subtitulo}" VerticalOptions="Center" />
+            <Button Grid.Column="1" Text="✕" Command="{Binding CerrarCommand}"
+                    BackgroundColor="#F1F5F9" TextColor="{StaticResource TextoMedio}"
+                    WidthRequest="44" HeightRequest="44" MinimumHeightRequest="44" CornerRadius="22" Padding="0"
+                    FontSize="18" />
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="18" Padding="0,28,0,0" MaximumWidthRequest="460">
+            <Border WidthRequest="64" HeightRequest="64" StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                    BackgroundColor="{StaticResource MarcaSuave}" HorizontalOptions="Center">
+                <Label Text="🔢" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label Text="Ingresa el código de 6 dígitos" Style="{StaticResource Titulo}" FontSize="22"
+                   HorizontalTextAlignment="Center" />
+            <Label Text="Aparece debajo del QR en la pantalla del docente y cambia cada pocos segundos. Ingrésalo rápido."
+                   Style="{StaticResource Suave}" FontSize="14" HorizontalTextAlignment="Center" />
+
+            <Border Style="{StaticResource CampoTexto}" StrokeShape="RoundRectangle 18" Padding="12,6"
+                    Stroke="{StaticResource MarcaBorde}" StrokeThickness="2" BackgroundColor="White">
+                <Entry x:Name="EntradaCodigo"
+                       Text="{Binding Codigo}"
+                       Keyboard="Numeric"
+                       MaxLength="6"
+                       Placeholder="000000"
+                       FontSize="40"
+                       FontAttributes="Bold"
+                       CharacterSpacing="12"
+                       TextColor="{StaticResource MarcaProfundo}"
+                       HorizontalTextAlignment="Center"
+                       ReturnType="Done"
+                       ReturnCommand="{Binding MarcarCommand}" />
+            </Border>
+
+            <Button Text="Marcar asistencia" Command="{Binding MarcarCommand}" Shadow="{StaticResource SombraMarca}" />
+            <ActivityIndicator IsRunning="{Binding Ocupado}" IsVisible="{Binding Ocupado}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

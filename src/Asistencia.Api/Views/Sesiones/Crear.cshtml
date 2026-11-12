@@ -1,0 +1,17 @@
+@model CrearSesionViewModel
+@{
+    ViewData["Title"] = "Nueva sesión";
+}
+<a asp-controller="Cursos" asp-action="Detalle" asp-route-id="@Model.CursoId" class="migas">@Iconos.Svg("atras", "size-4") @Model.NombreCurso</a>
+<h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900">Nueva sesión</h1>
+
+<form asp-action="Crear" method="post" class="tarjeta mt-6 max-w-2xl" data-form-sesion>
+    <div class="space-y-5 p-6">
+        <div asp-validation-summary="All"></div>
+        <partial name="~/Views/Sesiones/_CamposSesion.cshtml" model="Model" />
+    </div>
+    <div class="modal-pie rounded-b-2xl">
+        <a asp-controller="Cursos" asp-action="Detalle" asp-route-id="@Model.CursoId" class="btn-secundario">Cancelar</a>
+        <button class="btn-primario">@Iconos.Svg("mas", "size-4") Crear sesión</button>
+    </div>
+</form>

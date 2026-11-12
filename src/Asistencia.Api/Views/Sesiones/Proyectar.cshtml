@@ -1,0 +1,82 @@
+@model SesionRow
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proyección · @Model.Curso</title>
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+</head>
+@* Pensada para proyector o para compartir pantalla en Zoom/Teams/Meet: alto contraste y tipografía grande. *@
+<body class="h-full bg-slate-950 text-white">
+<main id="app" data-url="@Url.Action("Estado", new { id = Model.SesionId })"
+      class="relative flex min-h-screen flex-col overflow-hidden bg-[radial-gradient(ellipse_at_top_left,var(--color-marca-900),transparent_55%),radial-gradient(ellipse_at_bottom_right,#0c4a6e,transparent_50%)] px-[3vw] py-[3vh]">
+
+    <header class="flex items-start justify-between gap-8">
+        <div class="flex items-center gap-4">
+            <span class="grid size-14 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/15">@Iconos.Svg("birrete", "size-8")</span>
+            <div>
+                <div class="text-[clamp(1.2rem,2.4vw,2.2rem)] font-bold leading-tight">@Model.Curso</div>
+                <div class="mt-1 text-[clamp(.9rem,1.3vw,1.2rem)] text-white/60">@(Model.Tema ?? "Registro de asistencia") · @Model.Modalidad</div>
+            </div>
+        </div>
+        <div class="rounded-2xl bg-white/10 px-6 py-3 text-right ring-1 ring-white/15 backdrop-blur">
+            <div class="text-[clamp(1.8rem,3.6vw,3.4rem)] font-extrabold leading-none tabular-nums">
+                <span id="registrados">0</span><span class="text-white/40"> / <span id="matriculados">@Model.Matriculados</span></span>
+            </div>
+            <div class="mt-1 text-sm text-white/60">registrados</div>
+        </div>
+    </header>
+
+    @* Checkpoint activo *@
+    <section id="activo" class="flex flex-1 flex-wrap items-center justify-center gap-[5vw] py-6" hidden>
+        <div class="rounded-[2rem] bg-white p-5 shadow-2xl shadow-marca-950/60">
+            <img id="qr" alt="Código QR de asistencia" class="block size-[min(56vh,80vw)] [image-rendering:pixelated]" />
+            <div class="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
+                <div id="barraToken" class="h-full w-full rounded-full bg-linear-to-r from-emerald-400 to-emerald-600 transition-[width] duration-1000 ease-linear"></div>
+            </div>
+        </div>
+        <div class="max-w-xl">
+            <p class="flex items-center gap-3 text-[clamp(1.1rem,2.2vw,2rem)] font-semibold">
+                <span class="grid size-12 place-items-center rounded-xl bg-emerald-500/20 text-emerald-300">@Iconos.Svg("qr", "size-7")</span>
+                <span>Abre la app <b class="text-emerald-300">Asistencia</b> y escanea el QR</span>
+            </p>
+            <p class="mt-10 text-[clamp(.95rem,1.4vw,1.25rem)] text-white/60">¿Sigues la clase en el mismo celular? Ingresa este código:</p>
+            <div id="codigo" class="mt-2 whitespace-nowrap font-mono text-[clamp(3rem,6.5vw,7rem)] font-extrabold leading-none tracking-[.06em] tabular-nums">––– –––</div>
+            <p class="mt-3 text-lg text-white/60">Cambia en <span id="segToken" class="font-semibold text-white tabular-nums">–</span> s</p>
+
+            <div class="mt-10 inline-flex items-center gap-3 rounded-xl bg-amber-400/10 px-4 py-3 text-lg ring-1 ring-amber-300/30">
+                @Iconos.Svg("reloj", "size-6 text-amber-300")
+                <span>Checkpoint #<span id="orden">–</span> · se cierra en <b id="segCheckpoint" class="text-amber-300 tabular-nums">–</b></span>
+            </div>
+        </div>
+    </section>
+
+    @* Sin checkpoint *@
+    <section id="espera" class="flex flex-1 flex-col items-center justify-center text-center" hidden>
+        <span class="relative mb-8 flex size-8">
+            <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+            <span class="relative inline-flex size-8 rounded-full bg-emerald-500"></span>
+        </span>
+        <p class="text-[clamp(1.4rem,3vw,2.6rem)] font-semibold">Esperando el próximo checkpoint…</p>
+        <p class="mt-2 text-lg text-white/50">Mantén esta pantalla visible durante la clase.</p>
+    </section>
+
+    <section id="cerrada" class="flex flex-1 flex-col items-center justify-center text-center" hidden>
+        <span class="mb-6 grid size-20 place-items-center rounded-3xl bg-white/10">@Iconos.Svg("candado", "size-10")</span>
+        <p class="text-[clamp(1.4rem,3vw,2.6rem)] font-semibold">La sesión está cerrada.</p>
+    </section>
+
+    <footer class="flex items-center justify-between text-sm text-white/50">
+        <button id="pantallaCompleta" type="button" class="inline-flex items-center gap-2 rounded-lg px-3 py-2 ring-1 ring-white/20 hover:bg-white/10 hover:text-white">
+            @Iconos.Svg("pantalla", "size-4") Pantalla completa
+        </button>
+        <span id="estadoRed" class="[&.error]:font-semibold [&.error]:text-rose-300"></span>
+    </footer>
+</main>
+<script src="~/js/proyectar.js" asp-append-version="true"></script>
+</body>
+</html>

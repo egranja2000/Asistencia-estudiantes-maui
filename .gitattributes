@@ -1,0 +1,16 @@
+# Normaliza finales de línea; Visual Studio en Windows usa CRLF en el checkout
+* text=auto
+
+*.cs      text diff=csharp
+*.xaml    text
+*.cshtml  text
+*.csproj  text
+*.slnx    text
+*.sql     text
+*.md      text
+*.sh      text eol=lf
+
+*.png     binary
+*.jpg     binary
+*.ico     binary
+*.zip     binary

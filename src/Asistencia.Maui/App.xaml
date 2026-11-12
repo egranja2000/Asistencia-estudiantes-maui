@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:Asistencia.Maui.Convertidores"
+             x:Class="Asistencia.Maui.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <conv:NoVacioConverter x:Key="NoVacio" />
+            <conv:NegarConverter x:Key="Negar" />
+
+            <!--
+                Paleta alineada con el portal web (Tailwind: indigo + slate).
+                Cambia aquí y se aplica a toda la app.
+            -->
+            <Color x:Key="Marca">#4F46E5</Color>          <!-- indigo-600 -->
+            <Color x:Key="MarcaOscuro">#4338CA</Color>    <!-- indigo-700 -->
+            <Color x:Key="MarcaProfundo">#312E81</Color>  <!-- indigo-900 -->
+            <Color x:Key="MarcaSuave">#EEF2FF</Color>     <!-- indigo-50 -->
+            <Color x:Key="MarcaBorde">#C7D2FE</Color>     <!-- indigo-200 -->
+            <Color x:Key="Fondo">#F8FAFC</Color>          <!-- slate-50 -->
+            <Color x:Key="Superficie">#FFFFFF</Color>
+            <Color x:Key="Borde">#E2E8F0</Color>          <!-- slate-200 -->
+            <Color x:Key="Texto">#0F172A</Color>          <!-- slate-900 -->
+            <Color x:Key="TextoMedio">#334155</Color>     <!-- slate-700 -->
+            <Color x:Key="TextoSuave">#64748B</Color>     <!-- slate-500 -->
+            <Color x:Key="Exito">#059669</Color>          <!-- emerald-600 -->
+            <Color x:Key="ExitoSuave">#ECFDF5</Color>
+            <Color x:Key="Peligro">#E11D48</Color>        <!-- rose-600 -->
+            <Color x:Key="PeligroSuave">#FFF1F2</Color>
+            <Color x:Key="Aviso">#D97706</Color>          <!-- amber-600 -->
+            <Color x:Key="AvisoSuave">#FFFBEB</Color>
+
+            <!-- Compatibilidad con el nombre anterior -->
+            <Color x:Key="Primario">#4F46E5</Color>
+
+            <LinearGradientBrush x:Key="DegradadoMarca" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#6366F1" Offset="0" />
+                <GradientStop Color="#4338CA" Offset="0.55" />
+                <GradientStop Color="#1E1B4B" Offset="1" />
+            </LinearGradientBrush>
+
+            <Shadow x:Key="SombraSuave" Brush="#0F172A" Offset="0,4" Radius="14" Opacity="0.08" />
+            <Shadow x:Key="SombraMarca" Brush="#4F46E5" Offset="0,8" Radius="18" Opacity="0.30" />
+
+            <!-- ============ Base ============ -->
+            <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
+                <Setter Property="BackgroundColor" Value="{StaticResource Fondo}" />
+            </Style>
+            <Style TargetType="Shell" ApplyToDerivedTypes="True">
+                <Setter Property="Shell.BackgroundColor" Value="{StaticResource Fondo}" />
+                <Setter Property="Shell.ForegroundColor" Value="{StaticResource Texto}" />
+                <Setter Property="Shell.TitleColor" Value="{StaticResource Texto}" />
+                <Setter Property="Shell.NavBarHasShadow" Value="False" />
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource Texto}" />
+                <Setter Property="FontSize" Value="15" />
+            </Style>
+            <Style TargetType="Entry">
+                <Setter Property="TextColor" Value="{StaticResource Texto}" />
+                <Setter Property="PlaceholderColor" Value="#94A3B8" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="MinimumHeightRequest" Value="48" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+            </Style>
+            <Style TargetType="ActivityIndicator">
+                <Setter Property="Color" Value="{StaticResource Marca}" />
+            </Style>
+
+            <!-- ============ Botones ============ -->
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource Marca}" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="CornerRadius" Value="14" />
+                <Setter Property="MinimumHeightRequest" Value="54" />
+                <Setter Property="Padding" Value="20,0" />
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="Scale" Value="0.98" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#A5B4FC" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+            <Style x:Key="BotonSecundario" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="TextColor" Value="{StaticResource MarcaOscuro}" />
+                <Setter Property="BorderColor" Value="{StaticResource MarcaBorde}" />
+                <Setter Property="BorderWidth" Value="1.5" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="CornerRadius" Value="14" />
+                <Setter Property="MinimumHeightRequest" Value="54" />
+            </Style>
+            <Style x:Key="BotonClaro" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#33FFFFFF" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="BorderColor" Value="#66FFFFFF" />
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="CornerRadius" Value="22" />
+                <Setter Property="MinimumHeightRequest" Value="44" />
+            </Style>
+
+            <!-- ============ Contenedores ============ -->
+            <Style x:Key="Tarjeta" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource Superficie}" />
+                <Setter Property="Stroke" Value="{StaticResource Borde}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 18" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="Shadow" Value="{StaticResource SombraSuave}" />
+            </Style>
+            <!-- Contenedor de un Entry (el subrayado nativo se quita en MauiProgram) -->
+            <Style x:Key="CampoTexto" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource Fondo}" />
+                <Setter Property="Stroke" Value="{StaticResource Borde}" />
+                <Setter Property="StrokeThickness" Value="1.5" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+                <Setter Property="Padding" Value="14,2" />
+            </Style>
+            <!-- Píldora de estado -->
+            <Style x:Key="Chip" TargetType="Border">
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="Padding" Value="10,4" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+            <Style x:Key="ChipTexto" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+
+            <!-- ============ Tipografía ============ -->
+            <Style x:Key="Titulo" TargetType="Label">
+                <Setter Property="FontSize" Value="26" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource Texto}" />
+            </Style>
+            <Style x:Key="Subtitulo" TargetType="Label">
+                <Setter Property="FontSize" Value="17" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource Texto}" />
+            </Style>
+            <Style x:Key="Seccion" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextoSuave}" />
+                <Setter Property="TextTransform" Value="Uppercase" />
+                <Setter Property="CharacterSpacing" Value="1" />
+                <Setter Property="Margin" Value="4,18,0,6" />
+            </Style>
+            <Style x:Key="Suave" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="{StaticResource TextoSuave}" />
+            </Style>
+            <Style x:Key="Etiqueta" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextoMedio}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

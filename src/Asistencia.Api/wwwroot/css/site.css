@@ -1,0 +1,26 @@
+:root {
+    --primario: #1f4e79;
+    --primario-claro: #e8f0f8;
+}
+
+body { background: #f6f8fa; }
+.barra { background: var(--primario); }
+.btn-primary { --bs-btn-bg: var(--primario); --bs-btn-border-color: var(--primario); --bs-btn-hover-bg: #173d5f; --bs-btn-hover-border-color: #173d5f; }
+.btn-outline-primary { --bs-btn-color: var(--primario); --bs-btn-border-color: var(--primario); --bs-btn-hover-bg: var(--primario); --bs-btn-hover-border-color: var(--primario); --bs-btn-active-bg: var(--primario); }
+
+.tarjeta { transition: box-shadow .15s, transform .15s; }
+.tarjeta:hover { box-shadow: 0 .4rem 1rem rgba(0,0,0,.08); transform: translateY(-1px); }
+
+.formulario { max-width: 760px; }
+.seccion { border: 1px solid #dee2e6; border-radius: .5rem; padding: 1rem; background: #fff; }
+.seccion legend { float: none; width: auto; padding: 0 .4rem; margin-bottom: .25rem; font-size: .95rem; }
+
+.estado { display: inline-block; padding: .1rem .55rem; border-radius: 1rem; font-size: .8rem; font-weight: 600; }
+.estado-presente    { background: #d1f2df; color: #146c43; }
+.estado-parcial     { background: #fff1c2; color: #8a6100; }
+.estado-ausente     { background: #f8d7da; color: #a52834; }
+.estado-justificado { background: #dbe7ff; color: #2a4fa0; }
+.estado-pendiente,
+.estado-programada  { background: #e9ecef; color: #495057; }
+.estado-abierta     { background: #d1f2df; color: #146c43; }
+.estado-cerrada     { background: #e9ecef; color: #495057; }
